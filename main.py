@@ -35,7 +35,7 @@ def final_process(data1: List[int], data2: List[int]) -> List[int]:
     """TODO: Document this function. What does it do? What are the inputs and outputs?"""
     return np.mean([x - y for x, y in zip(data1, data2)])
 
-offload_url = 'http://192.168.4.74:5000' # TODO: Change this to the IP address of your server
+offload_url = 'http://172.20.10.3:5000' # IP address of my macbook
 
 def run(offload: Optional[str] = None) -> float:
     """Run the program, offloading the specified function(s) to the server.
@@ -104,27 +104,33 @@ def main():
     #   Hint: store the results in a pandas DataFrame, use previous labs as a reference
     diction = {"None": [], "process1": [], "process2": [], "both": []}
     df = pd.DataFrame(diction)
-    for i in range(5):
+    
+    for _ in range(5):
         diction['None'].append(run())
     
-    for i in range(5):
+    for _ in range(5):
         diction['process1'].append(run(offload='process1'))
 
-    for i in range(5):
+    for _ in range(5):
         diction['process2'].append(run(offload='process2'))
 
-    for i in range(5):
+    for _ in range(5):
         diction['both'].append(run(offload='both'))
     
 
     # TODO: Plot makespans (total execution time) as a bar chart with error bars
     # Make sure to include a title and x and y labels
 
+    fig = px.bar(
+        df,
+        x = list(diction.keys()),
+        y = 'total execution time',
+        title = 'Total run time of different offloads'
+    )
+
+
+    fig.write_image("makespan.png")
     
-
-
-    # TODO: save plot to "makespan.png"
-
 
     # Question 4: What is the best offloading mode? Why do you think that is?
     # Question 5: What is the worst offloading mode? Why do you think that is?

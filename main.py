@@ -54,7 +54,8 @@ def run(offload: Optional[str] = None) -> float:
         data1 = None
         def offload_process1(data):
             nonlocal data1
-            # TODO: Send a POST request to the server with the input data
+            # Sends a POST request to the server with the input data
+            response = requests.post(offload_url, data1)
             data1 = response.json()
         thread = threading.Thread(target=offload_process1, args=(data,))
         thread.start()
@@ -66,11 +67,33 @@ def run(offload: Optional[str] = None) -> float:
         #   ChatGPT is also good at explaining the difference between parallel and concurrent execution!
         #   Make sure to cite any sources you use to answer this question.
     elif offload == 'process2':
-        # TODO: Implement this case
-        pass
+        data2 = None
+        def offload_process2(data):
+            nonlocal data2
+            # Sends a POST request to the server with the input data
+            response = requests.post(offload_url, data2)
+            data2 = response.json()
+        thread = threading.Thread(target=offload_process2, args=(data,))
+        thread.start()
+        data1 = process1(data)
+        thread.join()
     elif offload == 'both':
-        # TODO: Implement this case
-        pass
+        data1 = None
+        data2 = None
+        def offload_processBoth(data):
+            nonlocal data1
+            nonlocal data2
+            # Sends a POST request to the server with the input data
+            responseOne = requests.post(offload_url, data1)
+            responseTwo = requests.post(offload_url, data2)
+            data1 = responseOne.json()
+            data2 = responseTwo.json()
+        threadOne = threading.Thread(target=offload_process1, args=(data,))
+        threadTwo = threading.Thread(target=offload_process2, args=(data,))
+        threadOne.start()
+        threadTwo.start()
+        threadOne.join()
+        threadTwo.join()
 
     ans = final_process(data1, data2)
     return ans 
@@ -79,10 +102,25 @@ def main():
     # TODO: Run the program 5 times for each offloading mode, and record the total execution time
     #   Compute the mean and standard deviation of the execution times
     #   Hint: store the results in a pandas DataFrame, use previous labs as a reference
+    diction = {"None": [], "process1": [], "process2": [], "both": []}
+    df = pd.DataFrame(diction)
+    for i in range(5):
+        diction['None'].append(run())
+    
+    for i in range(5):
+        diction['process1'].append(run(offload='process1'))
 
+    for i in range(5):
+        diction['process2'].append(run(offload='process2'))
+
+    for i in range(5):
+        diction['both'].append(run(offload='both'))
+    
 
     # TODO: Plot makespans (total execution time) as a bar chart with error bars
     # Make sure to include a title and x and y labels
+
+    
 
 
     # TODO: save plot to "makespan.png"
